@@ -6,17 +6,18 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import by.homework.hlazarseni.noteswithfab.database.Note
 import by.homework.hlazarseni.noteswithfab.database.NoteDao
+import by.homework.hlazarseni.noteswithfab.utils.currentDateTime
 import kotlinx.coroutines.launch
 
 class ListViewModel(private val noteDao: NoteDao): ViewModel() {
 
-    val allCats: LiveData<List<Note>> = noteDao.getAllNotes().asLiveData()
+    val allNotes: LiveData<List<Note>> = noteDao.getAllNotes().asLiveData()
 
     fun createNote(): Note {
         return Note(
             title = "Новая заметка",
             description = "",
-            date = ""
+            date = currentDateTime()
         )
     }
 

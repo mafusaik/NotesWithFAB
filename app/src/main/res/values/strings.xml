@@ -2,4 +2,7 @@
     <string name="app_name">NotesWithFAB</string>
     <string name="submit">OK</string>
     <string name="save">save</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="date">Date</string>
 </resources>

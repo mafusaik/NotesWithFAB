@@ -20,5 +20,9 @@
         android:id="@+id/detail_fragment"
         android:name="by.homework.hlazarseni.noteswithfab.detail.DetailFragment"
         tools:layout="@layout/detail_fragment" >
+
+        <argument
+            android:name="note_id"
+            app:argType="integer" />
     </fragment>
 </navigation>

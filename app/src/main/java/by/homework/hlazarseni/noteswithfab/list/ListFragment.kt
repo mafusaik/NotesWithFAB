@@ -4,29 +4,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import by.homework.hlazarseni.noteswithfab.NoteAdapter
-import by.homework.hlazarseni.noteswithfab.R
+import by.homework.hlazarseni.noteswithfab.adapter.NoteAdapter
 import by.homework.hlazarseni.noteswithfab.addVerticalGaps
+import by.homework.hlazarseni.noteswithfab.database.Note
 import by.homework.hlazarseni.noteswithfab.databinding.ListFragmentBinding
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ListFragment : Fragment() {
 
     private var _binding: ListFragmentBinding? = null
     private val binding get() = requireNotNull(_binding)
 
-    private val viewModel by inject<ListViewModel>()
+    private val viewModel by viewModel<ListViewModel>()
 
     private val adapter by lazy {
         NoteAdapter(
             onItemClicked = {
-                editNote()
+                editNote(it)
             }
         )
     }
@@ -52,8 +51,6 @@ class ListFragment : Fragment() {
                 val newNote = viewModel.createNote()
                 viewModel.insertNote(newNote)
                 updateNotesList()
-                Toast.makeText(requireContext(), "hello", Toast.LENGTH_LONG)
-                    .show()
             }
 
             val linearLayoutManager = LinearLayoutManager(
@@ -100,12 +97,12 @@ class ListFragment : Fragment() {
         _binding = null
     }
 
-    private fun editNote() {
-        view?.findNavController()?.navigate(R.id.to_detail_fragment)
+    private fun editNote(currentNote: Note) {
+        findNavController().navigate(ListFragmentDirections.toDetailFragment(currentNote.id))
     }
 
     private fun updateNotesList() {
-        viewModel.allCats.observe(this.viewLifecycleOwner) { items ->
+        viewModel.allNotes.observe(this.viewLifecycleOwner) { items ->
             items.let {
                 adapter.submitList(it)
             }

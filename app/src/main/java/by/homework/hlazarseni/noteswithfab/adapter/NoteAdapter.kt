@@ -1,4 +1,4 @@
-package by.homework.hlazarseni.noteswithfab
+package by.homework.hlazarseni.noteswithfab.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,11 +9,10 @@ import by.homework.hlazarseni.noteswithfab.database.Note
 import by.homework.hlazarseni.noteswithfab.databinding.ItemNoteBinding
 
 class NoteAdapter(private val onItemClicked: (Note) -> Unit) :
-    ListAdapter<Note, NoteAdapter.CatViewHolder>(DIFF_UTIL) {
+    ListAdapter<Note, RecyclerView.ViewHolder>(DIFF_UTIL) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatViewHolder {
-       // return CatViewHolder.create(parent)
-        return CatViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return NoteViewHolder(
             ItemNoteBinding.inflate(
                 LayoutInflater.from(
                     parent.context
@@ -22,23 +21,13 @@ class NoteAdapter(private val onItemClicked: (Note) -> Unit) :
         )
     }
 
-    override fun onBindViewHolder(holder: CatViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val current = getItem(position)
         holder.itemView.setOnClickListener {
             onItemClicked(current)
         }
+        checkNotNull(holder as NoteViewHolder) { "incorrect viewholder" }
         holder.bind(current)
-    }
-
-    class CatViewHolder(private var binding: ItemNoteBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(note: Note) {
-            binding.title.text = note.title
-            binding.description.text = note.description
-            binding.date.text = note.date
-
-        }
     }
 
     companion object {
@@ -55,7 +44,7 @@ class NoteAdapter(private val onItemClicked: (Note) -> Unit) :
                 oldItem: Note,
                 newItem: Note
             ): Boolean {
-                return oldItem == newItem
+                return oldItem.id == newItem.id
             }
         }
     }

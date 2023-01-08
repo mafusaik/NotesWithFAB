@@ -15,7 +15,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/container_title"
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp">
@@ -37,7 +37,8 @@
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edit_text_description"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
+            android:gravity="top"
             android:text="" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -47,6 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:textSize="20sp"
-        android:hint="Date"/>
+        android:text=""
+        android:hint="@string/date"/>
 
 </LinearLayout>
