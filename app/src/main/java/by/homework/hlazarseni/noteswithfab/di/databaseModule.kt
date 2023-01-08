@@ -13,7 +13,7 @@ internal val databaseModule = module {
             NoteDatabase::class.java,
             "note-database"
         )
-            .allowMainThreadQueries()
+         //   .allowMainThreadQueries()
             .build()
     }
     single { get<NoteDatabase>().noteDao }

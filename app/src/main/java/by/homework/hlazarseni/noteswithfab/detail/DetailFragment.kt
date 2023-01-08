@@ -13,7 +13,9 @@ import by.homework.hlazarseni.noteswithfab.database.NoteDao
 import by.homework.hlazarseni.noteswithfab.databinding.DetailFragmentBinding
 import by.homework.hlazarseni.noteswithfab.utils.currentDateTime
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class DetailFragment(private val noteDao: NoteDao) : Fragment() {
@@ -37,14 +39,14 @@ class DetailFragment(private val noteDao: NoteDao) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         with(binding) {
-
-            val currentNode = currentNote(args.noteId)
-            if (currentNode.title.isNotBlank() && currentNode.description.isNotBlank()) {
-                editTextTitle.setText(currentNode.title)
-                editTextDescription.setText(currentNode.description)
-                date.text = currentNode.date
+            lifecycleScope.launch {
+                val currentNode = currentNote(args.noteId)
+                if (currentNode.title.isNotBlank() && currentNode.description.isNotBlank()) {
+                    editTextTitle.setText(currentNode.title)
+                    editTextDescription.setText(currentNode.description)
+                    date.text = currentNode.date
+                }
             }
-
             toolbar
                 .setOnMenuItemClickListener {
                     val id = args.noteId
@@ -52,7 +54,9 @@ class DetailFragment(private val noteDao: NoteDao) : Fragment() {
                     val description = containerDescription.getText()
 
                     if (it.itemId == R.id.action_save) {
-                        updateNote(id, title, description)
+                        lifecycleScope.launch {
+                            updateNote(id, title, description)
+                        }
                         return@setOnMenuItemClickListener true
                     } else return@setOnMenuItemClickListener false
                 }
@@ -71,19 +75,22 @@ class DetailFragment(private val noteDao: NoteDao) : Fragment() {
         return editText?.text.toString()
     }
 
-    private fun updateNote(noteId: Int, editTitle: String, editDescription: String) {
-        val note = Note(
-            id = noteId,
-            title = editTitle,
-            description = editDescription,
-            date = currentDateTime()
-        )
-        lifecycleScope.launch {
-            noteDao.update(note)
+    private suspend fun updateNote(noteId: Int, editTitle: String, editDescription: String) =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val note = Note(
+                id = noteId,
+                title = editTitle,
+                description = editDescription,
+                date = currentDateTime()
+            )
+            runCatching {
+                noteDao.update(note)
+            }
         }
-    }
 
-        private fun currentNote(noteId: Int):Note{
-            return noteDao.getNote(noteId)
+    private suspend fun currentNote(noteId: Int): Note = withContext(Dispatchers.IO) {
+        return@withContext noteDao.getNote(noteId)
     }
 }

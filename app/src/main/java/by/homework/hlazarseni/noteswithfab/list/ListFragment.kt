@@ -1,19 +1,34 @@
 package by.homework.hlazarseni.noteswithfab.list
 
+
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import by.homework.hlazarseni.noteswithfab.Lce
+import by.homework.hlazarseni.noteswithfab.R
 import by.homework.hlazarseni.noteswithfab.adapter.NoteAdapter
 import by.homework.hlazarseni.noteswithfab.addVerticalGaps
 import by.homework.hlazarseni.noteswithfab.database.Note
 import by.homework.hlazarseni.noteswithfab.databinding.ListFragmentBinding
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.runningReduce
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 class ListFragment : Fragment() {
 
@@ -47,9 +62,47 @@ class ListFragment : Fragment() {
 
         with(binding) {
 
+            viewLifecycleOwner.lifecycleScope.launch {
+                progressHorizontal.isVisible = true
+                progress.isVisible = true
+                progressLoading()
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.apiFlow
+                        .onEach {
+                            when (it) {
+                                is Lce.Loading -> {
+                                    //progress.isVisible = true
+                                }
+                                is Lce.Content -> {
+                                    progress.isVisible = false
+                                    progressHorizontal.isVisible = false
+                                   // adapter.submitList(it.data)
+                                }
+                                is Lce.Error -> {
+                                    val toast = Toast.makeText(
+                                        requireContext(),
+                                        getString(R.string.error_data),
+                                        Toast.LENGTH_SHORT
+                                    )
+                                    toast.setGravity(Gravity.CENTER, 0, 0)
+                                    toast.show()
+                                    progress.isVisible = false
+                                    progressHorizontal.isVisible = false
+                                }
+                            }
+                        }
+                        .launchIn(viewLifecycleOwner.lifecycle.coroutineScope)
+                }
+            }
+
             fab.setOnClickListener {
                 val newNote = viewModel.createNote()
-                viewModel.insertNote(newNote)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.insertNote(newNote)
+                }
                 updateNotesList()
             }
 
@@ -58,6 +111,7 @@ class ListFragment : Fragment() {
             )
 
             swipeRefresh.setOnRefreshListener {
+                updateNotesList()
                 swipeRefresh.isRefreshing = false
             }
 
@@ -80,8 +134,9 @@ class ListFragment : Fragment() {
                 override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                     val position = viewHolder.adapterPosition
                     val note = adapter.currentList[position]
-                    viewModel.deleteNote(note)
-
+                    lifecycleScope.launch {
+                        viewModel.deleteNote(note)
+                    }
                 }
             }
             ItemTouchHelper(itemTouchHelperCallback).apply {
@@ -89,7 +144,6 @@ class ListFragment : Fragment() {
             }
         }
         updateNotesList()
-
     }
 
     override fun onDestroyView() {
@@ -106,6 +160,13 @@ class ListFragment : Fragment() {
             items.let {
                 adapter.submitList(it)
             }
+        }
+    }
+
+    private suspend fun progressLoading() {
+        for (i in 1..10) {
+            delay(500)
+            binding.progressHorizontal.progress += 10
         }
     }
 }

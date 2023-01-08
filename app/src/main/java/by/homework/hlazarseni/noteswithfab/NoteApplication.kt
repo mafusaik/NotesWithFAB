@@ -1,6 +1,7 @@
 package by.homework.hlazarseni.noteswithfab
 
 import android.app.Application
+import by.homework.hlazarseni.noteswithfab.di.apiModule
 import by.homework.hlazarseni.noteswithfab.di.databaseModule
 import by.homework.hlazarseni.noteswithfab.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
@@ -17,7 +18,8 @@ class NoteApplication : Application() {
             androidContext(this@NoteApplication)
             modules(
                 databaseModule,
-                viewModelModule
+                viewModelModule,
+                apiModule
             )
         }
     }
