@@ -2,4 +2,9 @@
     <string name="app_name">NotesWithFAB</string>
     <string name="submit">OK</string>
     <string name="save">save</string>
+    <string name="title">Тема</string>
+    <string name="description">Заметка</string>
+    <string name="date">Дата</string>
+    <string name="error_data">"Нет данных"</string>
+    <string name="error_connection">"Нет интернета"</string>
 </resources>

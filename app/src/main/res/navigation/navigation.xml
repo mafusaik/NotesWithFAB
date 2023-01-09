@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/list_fragment">
+
+
+    <fragment
+        android:id="@+id/list_fragment"
+        android:name="by.homework.hlazarseni.noteswithfab.list.ListFragment"
+        tools:layout="@layout/list_fragment">
+
+        <action
+            android:id="@+id/to_detail_fragment"
+            app:destination="@id/detail_fragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/detail_fragment"
+        android:name="by.homework.hlazarseni.noteswithfab.detail.DetailFragment"
+        tools:layout="@layout/detail_fragment" >
+
+        <argument
+            android:name="note_id"
+            app:argType="integer" />
+    </fragment>
+</navigation>

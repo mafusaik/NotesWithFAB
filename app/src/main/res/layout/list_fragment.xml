@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/progress_horizontal"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="10dp"
+        android:layout_alignParentTop="true"
+        android:visibility="gone"
+        android:max="100"
+        app:layout_constraintBottom_toTopOf="@id/swipe_refresh"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
+        app:layout_constraintTop_toBottomOf="@id/progress_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="16dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="5"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_note" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_baseline_add_24"
+        android:contentDescription="@string/submit"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="@id/swipe_refresh"
+        app:layout_constraintEnd_toEndOf="@id/swipe_refresh"
+        android:layout_margin="16dp"/>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
