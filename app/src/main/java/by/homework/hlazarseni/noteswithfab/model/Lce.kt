@@ -1,4 +1,4 @@
-package by.homework.hlazarseni.noteswithfab
+package by.homework.hlazarseni.noteswithfab.model
 
 sealed class Lce<out T>{
     object Loading : Lce<Nothing>()

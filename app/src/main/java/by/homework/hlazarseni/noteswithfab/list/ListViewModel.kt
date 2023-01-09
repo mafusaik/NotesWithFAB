@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import by.homework.hlazarseni.noteswithfab.Lce
-import by.homework.hlazarseni.noteswithfab.api.BankCardDTO
+import by.homework.hlazarseni.noteswithfab.model.Lce
 import by.homework.hlazarseni.noteswithfab.api.BinApi
-import by.homework.hlazarseni.noteswithfab.database.Note
+import by.homework.hlazarseni.noteswithfab.model.Note
 import by.homework.hlazarseni.noteswithfab.database.NoteDao
-import by.homework.hlazarseni.noteswithfab.utils.currentDateTime
+import by.homework.hlazarseni.noteswithfab.mapper.toDomainModels
+import by.homework.hlazarseni.noteswithfab.utils.currentDate
+import by.homework.hlazarseni.noteswithfab.utils.currentTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
@@ -23,35 +24,32 @@ class ListViewModel(
 
     val allNotes: LiveData<List<Note>> = noteDao.getAllNotes().asLiveData()
 
-    //private val _apiFlow = MutableStateFlow<Lce<List<Note>>>(
-    private val _apiFlow = MutableStateFlow<Lce<BankCardDTO>>(
+    private val _apiFlow = MutableStateFlow<Lce<List<Note>>>(
         Lce.Loading
     )
 
     val apiFlow = _apiFlow
         .map {
             delay(5000)
-            getInfo()
+            getFakeInfo()
                 .fold(
                     onSuccess = {
+                        insertNotes(it)
                         Lce.Content(it)
                     },
                     onFailure = {
                         Lce.Error(it)
+                        getNotesDB().fold(
+                            onSuccess = {list->
+                                Lce.Content(list)
+                            },
+                            onFailure = {t->
+                                Lce.Error(t)
+                            }
+                        )
                     }
                 )
         }
-//        .map {
-//            getData()
-//                .fold(
-//                    onSuccess = {
-//                        Lce.Content(it)
-//                    },
-//                    onFailure = {
-//                        Lce.Error(it)
-//                    }
-//                )
-//        }
         .shareIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -62,7 +60,8 @@ class ListViewModel(
         return Note(
             title = "Новая заметка",
             description = "",
-            date = currentDateTime()
+            time = currentTime(),
+            date = currentDate()
         )
     }
 
@@ -72,21 +71,43 @@ class ListViewModel(
         }
     }
 
+    private suspend fun insertNotes(notes: List<Note>) = withContext(Dispatchers.IO) {
+        runCatching {
+            noteDao.insertAll(notes)
+        }
+    }
+
     suspend fun deleteNote(note: Note) = withContext(Dispatchers.IO) {
         runCatching {
             noteDao.delete(note)
         }
     }
 
-    private suspend fun getInfo() = withContext(Dispatchers.IO) {
+    private suspend fun getFakeInfo() = withContext(Dispatchers.IO) {
         runCatching {
-            api.getInfo("45717360")
+            api.getFakeData("45717360").toDomainModels()
         }
     }
 
-    private suspend fun getData() = withContext(Dispatchers.IO) {
+    private suspend fun getNotesDB() = withContext(Dispatchers.IO) {
         runCatching {
-            noteDao.getAllNotes2()
+            noteDao.getAllNotesFlow()
         }
     }
+
+    suspend fun updateNote(noteId: Int, editTitle: String, editDescription: String, time: String, date:String) =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val note = Note(
+                id = noteId,
+                title = editTitle,
+                description = editDescription,
+                time = time,
+                date = date
+            )
+            runCatching {
+                noteDao.update(note)
+            }
+        }
 }

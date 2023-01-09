@@ -8,10 +8,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import by.homework.hlazarseni.noteswithfab.R
-import by.homework.hlazarseni.noteswithfab.database.Note
+import by.homework.hlazarseni.noteswithfab.model.Note
 import by.homework.hlazarseni.noteswithfab.database.NoteDao
 import by.homework.hlazarseni.noteswithfab.databinding.DetailFragmentBinding
-import by.homework.hlazarseni.noteswithfab.utils.currentDateTime
+import by.homework.hlazarseni.noteswithfab.utils.currentDate
+import by.homework.hlazarseni.noteswithfab.utils.currentTime
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,7 +45,7 @@ class DetailFragment(private val noteDao: NoteDao) : Fragment() {
                 if (currentNode.title.isNotBlank() && currentNode.description.isNotBlank()) {
                     editTextTitle.setText(currentNode.title)
                     editTextDescription.setText(currentNode.description)
-                    date.text = currentNode.date
+                    date.text = currentNode.time
                 }
             }
             toolbar
@@ -83,7 +84,8 @@ class DetailFragment(private val noteDao: NoteDao) : Fragment() {
                 id = noteId,
                 title = editTitle,
                 description = editDescription,
-                date = currentDateTime()
+                time = currentTime(),
+                date = currentDate()
             )
             runCatching {
                 noteDao.update(note)

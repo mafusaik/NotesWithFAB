@@ -1,7 +1,7 @@
 package by.homework.hlazarseni.noteswithfab.adapter
 
 import androidx.recyclerview.widget.RecyclerView
-import by.homework.hlazarseni.noteswithfab.database.Note
+import by.homework.hlazarseni.noteswithfab.model.Note
 import by.homework.hlazarseni.noteswithfab.databinding.ItemNoteBinding
 
 class NoteViewHolder(
@@ -13,7 +13,7 @@ class NoteViewHolder(
         with(binding) {
             title.text = note.title
             description.text = note.description
-            date.text = note.date
+            date.text = note.time
         }
     }
 }

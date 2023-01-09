@@ -1,4 +1,4 @@
-package by.homework.hlazarseni.noteswithfab.database
+package by.homework.hlazarseni.noteswithfab.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,5 +9,6 @@ data class Note(
     val id: Int = 0,
     val title: String,
     val description: String,
+    val time: String,
     val date: String
 )

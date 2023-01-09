@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import by.homework.hlazarseni.noteswithfab.database.Note
+import by.homework.hlazarseni.noteswithfab.model.Note
 import by.homework.hlazarseni.noteswithfab.databinding.ItemNoteBinding
 
 class NoteAdapter(private val onItemClicked: (Note) -> Unit) :

@@ -17,16 +17,17 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import by.homework.hlazarseni.noteswithfab.Lce
+import by.homework.hlazarseni.noteswithfab.model.Lce
 import by.homework.hlazarseni.noteswithfab.R
 import by.homework.hlazarseni.noteswithfab.adapter.NoteAdapter
 import by.homework.hlazarseni.noteswithfab.addVerticalGaps
-import by.homework.hlazarseni.noteswithfab.database.Note
+import by.homework.hlazarseni.noteswithfab.model.Note
 import by.homework.hlazarseni.noteswithfab.databinding.ListFragmentBinding
-import kotlinx.coroutines.*
+import by.homework.hlazarseni.noteswithfab.utils.currentDate
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.runningReduce
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -66,35 +67,16 @@ class ListFragment : Fragment() {
                 progressHorizontal.isVisible = true
                 progress.isVisible = true
                 progressLoading()
+
+            }
+            viewLifecycleOwner.lifecycleScope.launch {
+                updateTimeNotes()
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    viewModel.apiFlow
-                        .onEach {
-                            when (it) {
-                                is Lce.Loading -> {
-                                    //progress.isVisible = true
-                                }
-                                is Lce.Content -> {
-                                    progress.isVisible = false
-                                    progressHorizontal.isVisible = false
-                                   // adapter.submitList(it.data)
-                                }
-                                is Lce.Error -> {
-                                    val toast = Toast.makeText(
-                                        requireContext(),
-                                        getString(R.string.error_data),
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    toast.setGravity(Gravity.CENTER, 0, 0)
-                                    toast.show()
-                                    progress.isVisible = false
-                                    progressHorizontal.isVisible = false
-                                }
-                            }
-                        }
-                        .launchIn(viewLifecycleOwner.lifecycle.coroutineScope)
+
+                    updateNoteListTest()
                 }
             }
 
@@ -155,6 +137,25 @@ class ListFragment : Fragment() {
         findNavController().navigate(ListFragmentDirections.toDetailFragment(currentNote.id))
     }
 
+    private suspend fun progressLoading() {
+        for (i in 1..10) {
+            delay(500)
+            binding.progressHorizontal.progress += 10
+        }
+    }
+
+    private fun updateTimeNotes() {
+        viewModel.allNotes.observe(this.viewLifecycleOwner) { notes ->
+            notes.forEach() {
+                if (it.date != currentDate()) {
+                    lifecycleScope.launch {
+                        viewModel.updateNote(it.id, it.title, it.description, it.date, it.date)
+                    }
+                }
+            }
+        }
+    }
+
     private fun updateNotesList() {
         viewModel.allNotes.observe(this.viewLifecycleOwner) { items ->
             items.let {
@@ -163,10 +164,31 @@ class ListFragment : Fragment() {
         }
     }
 
-    private suspend fun progressLoading() {
-        for (i in 1..10) {
-            delay(500)
-            binding.progressHorizontal.progress += 10
+    private fun updateNoteListTest() {
+        with(binding) {
+            viewModel.apiFlow
+                .onEach {
+                    when (it) {
+                        is Lce.Loading -> {}
+                        is Lce.Content -> {
+                            progress.isVisible = false
+                            progressHorizontal.isVisible = false
+                            adapter.submitList(it.data)
+                        }
+                        is Lce.Error -> {
+                            val toast = Toast.makeText(
+                                requireContext(),
+                                getString(R.string.error_data),
+                                Toast.LENGTH_SHORT
+                            )
+                            toast.setGravity(Gravity.CENTER, 0, 0)
+                            toast.show()
+                            progress.isVisible = false
+                            progressHorizontal.isVisible = false
+                        }
+                    }
+                }
+                .launchIn(viewLifecycleOwner.lifecycle.coroutineScope)
         }
     }
 }

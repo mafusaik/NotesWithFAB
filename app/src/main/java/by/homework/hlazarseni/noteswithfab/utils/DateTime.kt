@@ -27,7 +27,7 @@ fun currentDate(): String {
 
 fun currentTime(): String {
   val formatter = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-    DateTimeFormatter.ofPattern("hh.mm")
+    DateTimeFormatter.ofPattern("hh:mm")
   } else {
     TODO("VERSION.SDK_INT < O")
   }
